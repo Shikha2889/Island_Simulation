@@ -22,6 +22,10 @@ def remove_dead_animal(current_animals, indexes_positions):
     return [i for j, i in enumerate(current_animals) if j not in indexes_positions]
 
 
+def get_survived_animal_from_the_selection(selected_animals, dead_animal):
+    return list(set(selected_animals) - set(dead_animal))[0]
+
+
 animal_populations = [[10, 10, 10], [10, 9, 10], [10, 8, 10], [10, 7, 10], [10, 6, 10], [10, 5, 10], [10, 4, 10],
                       [10, 3, 10], [10, 2, 10], [10, 1, 10]]  # populations of red hawk, snake and puma
 DEATH_STRATEGY = {("red_hawks", "snake"): "snake", ("snake", "red_hawks"): "snake",
@@ -41,16 +45,18 @@ for red_hawks_population, snake_population, puma_population in animal_population
         while True:
 
             if len(animals_in_island) == 1 or len(set(animals_in_island)) == 1:  # only one animal survived
-                animal_counter[animals_in_island[0]] += 1
                 break
 
             animal_index1, animal_index2 = get_random_animals_index_from_island(
                 animals_in_island)  # randomly selecting two animals from the island
             animals = get_animals_from_index_positions(animals_in_island, animal_index1, animal_index2)
             if len(animals.keys()) == 1:  # both selected animals are same, then do nothing
+                animal_counter[list(animals.keys())[0]] += 1
                 continue
             animals_in_island = remove_dead_animal(animals_in_island, animals[
                 DEATH_STRATEGY[tuple(animals)]])  # remove the animal which is dead from the island
+            survived_animal = get_survived_animal_from_the_selection(tuple(animals), DEATH_STRATEGY[tuple(animals)])
+            animal_counter[survived_animal] += 1
 
     print(
         f"""For the given population of {red_hawks_population},{snake_population},{puma_population} only {animal_counter} survived""")
